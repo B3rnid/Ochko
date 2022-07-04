@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include "classes.h"
 
-    //T(11), K(4), Q(3), J(2), 10, 9, 8, 7, 6 x4
+    //A(11), K(4), Q(3), J(2), 10, 9, 8, 7, 6 x4
     //по 1 карте
     //набрать 21 или больше чем у соперника
     //банкир выдаёт карты
@@ -21,18 +21,8 @@ int main()
     srand(time(NULL));
 
     Ochko obj;
-    system("CLS");
-    obj.deck_fill();
-    std::cout << "cash in the bank: " << obj.bank_cash;
-    std::cout << "\nyour cash: " << obj.player_cash;
-    std::cout << "\n\ncard on top of the deck: ";
-    obj.last_to_top();
-    std::cout << obj.deck[0];
-    std::cout << "\n\nyour deck: ";
-    obj.get_card();
-    for (std::string i : obj.player_deck)
-    {
-        std::cout << i;
-    }
 
+    obj.print_info();
+    obj.set_bet();
+    obj.gameplay();
 }
