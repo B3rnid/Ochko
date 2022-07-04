@@ -18,11 +18,52 @@
 
 int main()
 {
+    std::string next_round;
+
     srand(time(NULL));
 
     Ochko obj;
 
-    obj.print_info();
-    obj.set_bet();
-    obj.gameplay();
+    obj.bank_money();
+    obj.player_money();
+
+    do
+    {
+        obj.deck_fill();
+        obj.get_first_card();
+        obj.last_to_top();
+        obj.print_info();
+        obj.set_bet();
+        obj.gameplay();
+
+        if (obj.player_cash == 0)
+        {
+            std::cout << "\n\nyou lost all your money";
+            std::cout << "\nyou can't continue";
+            break;
+        }
+
+        if (obj.bank_cash == 0)
+        {
+            std::cout << "\n\nyou left the bank without any money";
+            std::cout << "\nyou can't continue";
+            break;
+        }
+
+        std::cout << "\n\nenter \"next\" if you want to continue";
+        std::cout << "\nenter \"stop\" if you want to stop playing\n";
+        std::cin >> next_round;
+
+        if (next_round != "next" && next_round != "stop")
+        {
+            do
+            {
+                std::cout << "\nincorrect value";
+                std::cout << "\nenter \"next\" if you want to continue";
+                std::cout << "\nenter \"stop\" if you want to stop playing\n";
+                std::cin >> next_round;
+
+            } while (next_round != "next" && next_round != "stop");
+        }
+    } while (next_round == "next");
 }

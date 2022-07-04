@@ -3,6 +3,8 @@
 class Ochko
 {
 public:
+	int player_cash = 0, bank_cash = 0;
+
 	Ochko();
 	
 	void deck_fill();
@@ -12,9 +14,10 @@ public:
 	void player_money();
 	void gameplay();
 	void print_info();
-	void sum_of_deck();
+	void sum_of_player_deck();
 	void set_bet();
 	void loss();
+	void get_first_card();
 
 	~Ochko();
 
@@ -22,43 +25,35 @@ private:
 	std::vector<std::string> deck;
 	std::vector<std::string> player_deck;
 	std::vector<std::string> bank_deck;
-	int bank_cash, player_cash, player_score, bet;
+	int player_score = 0, bank_score = 0, bet = 0;
 };
 
 Ochko::Ochko()
 {
-	deck.resize(36);
-
-	player_money();
-	bank_money();
-
-	system("CLS");
-	deck_fill();
-
-	player_deck.push_back(deck[0]);
-	deck.erase(deck.begin());
-	bank_deck.push_back(deck[0]);
-	deck.erase(deck.begin());
-
-	last_to_top();
 }
 
 void Ochko::print_info()
 {
+	system("CLS");
+
 	std::cout << "cash in the bank: " << bank_cash;
 	std::cout << "\nyour cash: " << player_cash;
 
 	std::cout << "\n\ncard on top of the deck: " << deck[0];
+
 	std::cout << "\nyour deck: ";
 	for (std::string i : player_deck)
 	{
 		std::cout << i << " ";
 	}
-	sum_of_deck();
+	sum_of_player_deck();
+	
+	std::cout << "\n";
 }
 
 void Ochko::deck_fill()
 {
+	deck.resize(36);
 	int card, count1 = 0, count2 = 0, count3 = 0, count4 = 0, count5 = 0, count6 = 0, count7 = 0, count8 = 0, count9 = 0;
 
 	for (int i = 0; i < 36; i++)
@@ -186,9 +181,9 @@ void Ochko::deck_fill()
 
 void Ochko::deck_print()
 {
-	for (int i = 0; i < 36; i++)
+	for (std::string i : deck)
 	{
-		std::cout << deck[i] << ' ';
+		std::cout << i << ' ';
 	}
 	std::cout << '\n';
 }
@@ -202,13 +197,13 @@ void Ochko::last_to_top()
 
 void Ochko::bank_money()
 {
-	std::cout << "Enter amount of cash in the bank: ";
+	std::cout << "enter amount of cash in the bank: ";
 	std::cin >> bank_cash;
 }
 
 void Ochko::player_money()
 {
-	std::cout << "Enter amount of your cash: ";
+	std::cout << "enter amount of your cash: ";
 	std::cin >> player_cash;
 }
 
@@ -218,20 +213,7 @@ void Ochko::gameplay()
 
 	for (int i = 0; key_word != "stop"; i++)
 	{
-		system("CLS");
-
-		player_deck.push_back(deck.back());
-		deck.pop_back();
-
-		print_info();
-
-		if (player_score > 21)
-		{
-			loss();
-			break;
-		}
-
-		std::cout << "\n\nenter \"more\" if you need more cards";
+		std::cout << "\nenter \"more\" if you need more cards";
 		std::cout << "\nenter \"stop\" if you don't need more cards\n";
 		std::cin >> key_word;
 
@@ -246,15 +228,124 @@ void Ochko::gameplay()
 
 			} while (key_word != "more" && key_word != "stop");
 		}
+
+		if (key_word == "more")
+		{
+			player_deck.push_back(deck.back());
+			deck.pop_back();
+
+			print_info();
+
+			if (player_deck[0] == "A" && player_deck[1] == "A")
+			{
+				player_cash += bet;
+				bank_cash -= bet;
+
+				std::cout << "\nyou have won";
+				break;
+			}
+			else if (player_deck.size() == 5)
+			{
+				std::cout << "\nyou have the maximum number of cards";
+				break;
+			}
+			else if (player_score > 21)
+			{
+				loss();
+				break;
+			}
+			else if (player_score == 21)
+			{
+				player_cash += bet;
+				bank_cash -= bet;
+
+				std::cout << "\nyou have won";
+				break;
+			}
+		}
 	}
 
-	if (player_score <= 21)
+	if (player_score < 21)
 	{
+		print_info();
 
+		bank_score = 0;
+		while (bank_score <= 16)
+		{
+			bank_deck.push_back(deck.back());
+			deck.pop_back();
+			if (bank_deck.back() == "A")
+			{
+				bank_score += 11;
+			}
+			if (bank_deck.back() == "K")
+			{
+				bank_score += 4;
+			}
+			if (bank_deck.back() == "Q")
+			{
+				bank_score += 3;
+			}
+			if (bank_deck.back() == "J")
+			{
+				bank_score += 2;
+			}
+			if (bank_deck.back() == "10")
+			{
+				bank_score += 10;
+			}
+			if (bank_deck.back() == "9")
+			{
+				bank_score += 9;
+			}
+			if (bank_deck.back() == "8")
+			{
+				bank_score += 8;
+			}
+			if (bank_deck.back() == "7")
+			{
+				bank_score += 7;
+			}
+			if (bank_deck.back() == "6")
+			{
+				bank_score += 6;
+			}
+		}
+
+		std::cout << "\nbank deck: ";
+		for (std::string i : bank_deck)
+		{
+			std::cout << i << " ";
+		}
+		std::cout << "(" << bank_score << ")\n";
+
+		if (player_score > bank_score)
+		{
+			player_cash += bet;
+			bank_cash -= bet;
+
+			std::cout << "\nyou have won";
+		}
+		else
+		{
+			loss();
+		}
+
+		for (std::string i : bank_deck)
+		{
+			deck.insert(deck.begin(), bank_deck[0]);
+			bank_deck.erase(bank_deck.begin());
+		}
+	}
+	
+	for (std::string i : player_deck)
+	{
+		deck.insert(deck.begin(), player_deck[0]);
+		player_deck.erase(player_deck.begin());
 	}
 }
 
-void Ochko::sum_of_deck()
+void Ochko::sum_of_player_deck()
 {
 	player_score = 0;
 
@@ -303,8 +394,15 @@ void Ochko::sum_of_deck()
 
 void Ochko::set_bet()
 {
-	std::cout << "\n\nenter your bet: ";
+	std::cout << "\nenter your bet: ";
 	std::cin >> bet;
+
+	if (bet > player_cash)
+	{
+		std::cout << "\nyou can't bet more than you have";
+		std::cout << "\nenter your bet: ";
+		std::cin >> bet;
+	}
 }
 
 void Ochko::loss()
@@ -312,10 +410,15 @@ void Ochko::loss()
 	player_cash -= bet;
 	bank_cash += bet;
 
-	system("CLS");
-	print_info();
+	std::cout << "\nyou have lost your bet";
+}
 
-	std::cout << "\n\nyou have lost your bet";
+void Ochko::get_first_card()
+{
+	player_deck.push_back(deck[0]);
+	deck.erase(deck.begin());
+	bank_deck.push_back(deck[0]);
+	deck.erase(deck.begin());
 }
 
 Ochko::~Ochko()
