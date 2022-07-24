@@ -7,17 +7,17 @@ public:
 
 	Ochko();
 	
-	void deck_fill();
-	void deck_print();
-	void last_to_top();
-	void bank_money();
-	void player_money();
-	void gameplay();
-	void print_info();
-	void sum_of_player_deck();
-	void set_bet();
-	void loss();
-	void get_first_card();
+	void deck_fill(); //случайное заполнение колоды
+	void deck_print(); //аргумент для проверки корректности колоды
+	void last_to_top(); //перемещение карты с конца колоды на её верх
+	void bank_money(); //ввод денег в банке в начале игры
+	void player_money(); //ввод денег игрока в начале игры
+	void gameplay(); //код, отвечающий за игровой процесс
+	void print_info(); //вывод информации на экран
+	void sum_of_player_deck(); //подсчёт очков игрока
+	void set_bet(); //ввод ставки на раунд
+	void loss(); //распределение денег после поражения
+	void get_first_card(); //выдача игрокам одной карты в начале раунда
 
 	~Ochko();
 
@@ -229,14 +229,14 @@ void Ochko::gameplay()
 			} while (key_word != "more" && key_word != "stop");
 		}
 
-		if (key_word == "more")
+		if (key_word == "more") //выдача игроку дополнительной карты
 		{
 			player_deck.push_back(deck.back());
 			deck.pop_back();
 
 			print_info();
 
-			if (player_deck[0] == "A" && player_deck[1] == "A")
+			if (player_deck[0] == "A" && player_deck[1] == "A") //"золотое очко"
 			{
 				player_cash += bet;
 				bank_cash -= bet;
@@ -244,17 +244,17 @@ void Ochko::gameplay()
 				std::cout << "\nyou have won";
 				break;
 			}
-			else if (player_deck.size() == 5)
-			{
-				std::cout << "\nyou have the maximum number of cards";
-				break;
-			}
-			else if (player_score > 21)
+			else if (player_score > 21) //проиграш в случае перебора
 			{
 				loss();
 				break;
 			}
-			else if (player_score == 21)
+			else if (player_deck.size() == 5) //если у игрока 5 карт, он не может взять больше
+			{
+				std::cout << "\nyou have the maximum number of cards";
+				break;
+			}
+			else if (player_score == 21) //победа если игрок набрал ровно 21 очко
 			{
 				player_cash += bet;
 				bank_cash -= bet;
@@ -265,51 +265,59 @@ void Ochko::gameplay()
 		}
 	}
 
-	if (player_score < 21)
+	if (player_score < 21) //если игрок набрал меньше 21 очка, он играет против банкира
 	{
 		print_info();
 
 		bank_score = 0;
-		while (bank_score <= 16)
+		while (true) //банкир берёт карты, пока его счёт не больше 16
 		{
 			bank_deck.push_back(deck.back());
 			deck.pop_back();
-			if (bank_deck.back() == "A")
+
+			bank_score = 0;
+
+			for (std::string i : bank_deck)
 			{
-				bank_score += 11;
+				if (i == "A")
+				{
+					bank_score += 11;
+				}
+				if (i == "K")
+				{
+					bank_score += 4;
+				}
+				if (i == "Q")
+				{
+					bank_score += 3;
+				}
+				if (i == "J")
+				{
+					bank_score += 2;
+				}
+				if (i == "10")
+				{
+					bank_score += 10;
+				}
+				if (i == "9")
+				{
+					bank_score += 9;
+				}
+				if (i == "8")
+				{
+					bank_score += 8;
+				}
+				if (i == "7")
+				{
+					bank_score += 7;
+				}
+				if (i == "6")
+				{
+					bank_score += 6;
+				}
 			}
-			if (bank_deck.back() == "K")
-			{
-				bank_score += 4;
-			}
-			if (bank_deck.back() == "Q")
-			{
-				bank_score += 3;
-			}
-			if (bank_deck.back() == "J")
-			{
-				bank_score += 2;
-			}
-			if (bank_deck.back() == "10")
-			{
-				bank_score += 10;
-			}
-			if (bank_deck.back() == "9")
-			{
-				bank_score += 9;
-			}
-			if (bank_deck.back() == "8")
-			{
-				bank_score += 8;
-			}
-			if (bank_deck.back() == "7")
-			{
-				bank_score += 7;
-			}
-			if (bank_deck.back() == "6")
-			{
-				bank_score += 6;
-			}
+
+			if (bank_score > 16) break;
 		}
 
 		std::cout << "\nbank deck: ";
@@ -319,14 +327,14 @@ void Ochko::gameplay()
 		}
 		std::cout << "(" << bank_score << ")\n";
 
-		if (player_score > bank_score)
+		if (player_score > bank_score) //победа игрока если счёт банка меньше
 		{
 			player_cash += bet;
 			bank_cash -= bet;
 
 			std::cout << "\nyou have won";
 		}
-		else
+		else //поригрыш если банк набрал больше очков
 		{
 			loss();
 		}
@@ -336,6 +344,7 @@ void Ochko::gameplay()
 			deck.insert(deck.begin(), bank_deck[0]);
 			bank_deck.erase(bank_deck.begin());
 		}
+		bank_deck.resize(0);
 	}
 	
 	for (std::string i : player_deck)
@@ -343,6 +352,7 @@ void Ochko::gameplay()
 		deck.insert(deck.begin(), player_deck[0]);
 		player_deck.erase(player_deck.begin());
 	}
+	player_deck.resize(0);
 }
 
 void Ochko::sum_of_player_deck()

@@ -27,7 +27,7 @@ int main()
     obj.bank_money();
     obj.player_money();
 
-    do
+    do //начало раунда
     {
         obj.deck_fill();
         obj.get_first_card();
@@ -36,14 +36,14 @@ int main()
         obj.set_bet();
         obj.gameplay();
 
-        if (obj.player_cash == 0)
+        if (obj.player_cash == 0) //остановка игры в случае потери всех своих денег
         {
             std::cout << "\n\nyou lost all your money";
             std::cout << "\nyou can't continue";
             break;
         }
 
-        if (obj.bank_cash == 0)
+        if (obj.bank_cash == 0) //остановка игры в случае потери всех денег банком
         {
             std::cout << "\n\nyou left the bank without any money";
             std::cout << "\nyou can't continue";
@@ -65,5 +65,5 @@ int main()
 
             } while (next_round != "next" && next_round != "stop");
         }
-    } while (next_round == "next");
+    } while (next_round == "next"); 
 }
